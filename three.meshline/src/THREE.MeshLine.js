@@ -712,3 +712,5 @@
     root.MeshLineRaycast = MeshLineRaycast
   }
 }.call(this))
+
+export { MeshLine, MeshLineMaterial, MeshLineRaycast };

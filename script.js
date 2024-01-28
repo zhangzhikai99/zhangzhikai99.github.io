@@ -10,6 +10,7 @@ let fogTimer = 0; // Timer for fog effect
 const fogMaxDensity = 0.15; // Consistent intensity of the fog
 const fogChangeSpeed = 0.001; // Speed at which fog density changes
 const fogLikelihood = 0.003; // Probability of fog appearing per 1 frame
+const foglevel = 0;
 const skySpeed = 0.5 //
 const starSpeed = 0.002; // Moving speed of star
 const starTiming = 3; // Smaller number allows you to see stars even in the daytime.

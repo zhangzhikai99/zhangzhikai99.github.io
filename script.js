@@ -333,32 +333,39 @@ function animate() {
 // Function to update fog effect
 function updateFog() {
     if (fogActive) {
-        // If fog is active, decrease timer
         fogTimer -= 1;
-        if (fogend == false) {
+
+        if (fogTimer > 0) {
             if (scene.fog.density < fogMaxDensity) {
                 scene.fog.density += fogChangeSpeed;
             } else {
-                fogend = true;
+                // Calculate the fluctuation
+                let fluctuation = fogMaxDensity + foglevel * fogMaxDensity * Math.sin(fogTimer * 0.03);
+
+                // Apply the fluctuation in a controlled way
+                if (Math.abs(scene.fog.density - fluctuation) > fogChangeSpeed) {
+                    scene.fog.density += fogChangeSpeed * Math.sign(Math.sin(fogTimer));
+                } else {
+                    scene.fog.density = fluctuation;
+                }
             }
         } else {
-            scene.fog.density = Math.min(fogMaxDensity, fogTimer * fogChangeSpeed);
-        }
-        if (fogTimer <= 0) {
-            // Disable fog when timer ends
-            fogActive = false;
-            scene.fog.density = 0;
+            if (scene.fog.density > 0) {
+                scene.fog.density -= fogChangeSpeed;
+            } else {
+                fogActive = false;
+            }
         }
     } else {
-        // If fog is not active, randomly start fog
-        if (Math.random() < fogLikelihood) { // Random chance to start fog
+        if (Math.random() < fogLikelihood) {
             fogActive = true;
-            fogend = false;
-            fogTimer = Math.random() * 120 + 300; // Random duration between 1-3 minutes
+            foglevel = Math.random();
+            fogTimer = foglevel * 120 + 300;
             scene.fog.density = 0;
         }
     }
 }
+
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;

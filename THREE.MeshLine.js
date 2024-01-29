@@ -24,16 +24,18 @@ MeshLine.prototype.setGeometry = function (g, c) {
 	this.positions = [];
 	this.counters = [];
 
-	if (g instanceof THREE.Geometry) {
-		for (var j = 0; j < g.vertices.length; j++) {
-			var v = g.vertices[j];
-			var c = j / g.vertices.length;
-			this.positions.push(v.x, v.y, v.z);
-			this.positions.push(v.x, v.y, v.z);
-			this.counters.push(c);
-			this.counters.push(c);
-		}
-	}
+if (g instanceof THREE.BufferGeometry) {
+    // Assume g has attribute 'position' which contains vertices positions (x, y, z)
+    var positions = g.attributes.position.array;
+    for (var j = 0; j < positions.length; j += 3) {
+        var c = j / positions.length;
+        this.positions.push(positions[j], positions[j+1], positions[j+2]);
+        this.positions.push(positions[j], positions[j+1], positions[j+2]);
+        this.counters.push(c);
+        this.counters.push(c);
+    }
+}
+
 
 	if (g instanceof THREE.BufferGeometry) {
 		// read attribute positions ?

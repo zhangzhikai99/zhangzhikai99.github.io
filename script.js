@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { MeshLine, MeshLineMaterial, MeshLineRaycast } from './three.meshiline/src/THREE.MeshiLine.js';
+import { MeshLine, MeshLineMaterial, MeshLineRaycast } from './three.meshline/src/THREE.MeshLine.js';
 
 
 let scene, camera, renderer, model, sky, sunLight, moonLight, ambientLight, skyLight, groundLight, controls;

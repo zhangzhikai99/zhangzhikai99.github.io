@@ -695,22 +695,6 @@
     return this
   }
 
-  if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = {
-        MeshLine: MeshLine,
-        MeshLineMaterial: MeshLineMaterial,
-        MeshLineRaycast: MeshLineRaycast,
-      }
-    }
-    exports.MeshLine = MeshLine
-    exports.MeshLineMaterial = MeshLineMaterial
-    exports.MeshLineRaycast = MeshLineRaycast
-  } else {
-    root.MeshLine = MeshLine
-    root.MeshLineMaterial = MeshLineMaterial
-    root.MeshLineRaycast = MeshLineRaycast
-  }
 }.call(this))
 
 export { MeshLine, MeshLineMaterial, MeshLineRaycast };

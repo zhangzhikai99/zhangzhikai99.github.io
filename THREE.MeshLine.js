@@ -235,9 +235,86 @@ MeshLine.prototype.advance = function (position) {
 
 };
 
-function MeshLineMaterial(parameters) {
+class MeshLineMaterial extends THREE.ShaderMaterial {
+    constructor(parameters = {}) {
+        super();
 
-	var vertexShaderSource = [
+        this.type = 'MeshLineMaterial';
+        
+        // 初始化参数或设置默认值
+        this.lineWidth = parameters.lineWidth || 1;
+        this.map = parameters.map || null;
+        this.useMap = parameters.useMap || 0;
+        this.alphaMap = parameters.alphaMap || null;
+        this.useAlphaMap = parameters.useAlphaMap || 0;
+        this.color = parameters.color || new THREE.Color(0xffffff);
+        this.opacity = parameters.opacity !== undefined ? parameters.opacity : 1;
+        this.resolution = parameters.resolution || new THREE.Vector2(1, 1);
+        this.sizeAttenuation = parameters.sizeAttenuation !== undefined ? parameters.sizeAttenuation : 1;
+        this.near = parameters.near !== undefined ? parameters.near : 1;
+        this.far = parameters.far !== undefined ? parameters.far : 1;
+        this.dashArray = parameters.dashArray || [];
+        this.useDash = this.dashArray.length > 0 ? 1 : 0;
+        this.visibility = parameters.visibility !== undefined ? parameters.visibility : 1;
+        this.alphaTest = parameters.alphaTest !== undefined ? parameters.alphaTest : 0;
+        this.repeat = parameters.repeat || new THREE.Vector2(1, 1);
+
+        // 初始化uniforms
+        this.uniforms = {
+            lineWidth: { value: this.lineWidth },
+            map: { value: this.map },
+            useMap: { value: this.useMap },
+            alphaMap: { value: this.alphaMap },
+            useAlphaMap: { value: this.useAlphaMap },
+            color: { value: this.color },
+            opacity: { value: this.opacity },
+            resolution: { value: this.resolution },
+            sizeAttenuation: { value: this.sizeAttenuation },
+            near: { value: this.near },
+            far: { value: this.far },
+            dashArray: { value: new THREE.Vector2(this.dashArray[0], this.dashArray[1]) },
+            useDash: { value: this.useDash },
+            visibility: { value: this.visibility },
+            alphaTest: { value: this.alphaTest },
+            repeat: { value: this.repeat },
+        };
+
+        // 设置着色器代码
+        this.vertexShader = vertexShaderSource;
+        this.fragmentShader = fragmentShaderSource;
+        
+        // 应用传入的参数
+        this.setValues(parameters);
+    }
+
+    // 复制函数
+    copy(source) {
+        super.copy(source);
+
+	this.lineWidth = source.lineWidth;
+	this.map = source.map;
+	this.useMap = source.useMap;
+	this.alphaMap = source.alphaMap;
+	this.useAlphaMap = source.useAlphaMap;
+	this.color.copy(source.color);
+	this.opacity = source.opacity;
+	this.resolution.copy(source.resolution);
+	this.sizeAttenuation = source.sizeAttenuation;
+	this.near = source.near;
+	this.far = source.far;
+	this.dashArray.copy(source.dashArray);
+	this.useDash = source.useDash;
+	this.visibility = source.visibility;
+	this.alphaTest = source.alphaTest;
+	this.repeat.copy(source.repeat);
+
+        return this;
+    }
+    
+}
+
+// 着色器代码作为字符串直接嵌入，或从外部加载
+const vertexShaderSource =  [
 		'precision highp float;',
 		'',
 		'attribute vec3 position;',
@@ -320,8 +397,7 @@ function MeshLineMaterial(parameters) {
 		'    gl_Position = finalPosition;',
 		'',
 		'}'];
-
-	var fragmentShaderSource = [
+const fragmentShaderSource = [
 		'#extension GL_OES_standard_derivatives : enable',
 		'precision mediump float;',
 		'',
@@ -352,105 +428,5 @@ function MeshLineMaterial(parameters) {
 		'	 gl_FragColor.a *= step(vCounters,visibility);',
 		'}'];
 
-	function check(v, d) {
-		if (v === undefined) return d;
-		return v;
-	}
-
-	THREE.Material.call(this);
-
-	parameters = parameters || {};
-
-	this.lineWidth = check(parameters.lineWidth, 1);
-	this.map = check(parameters.map, null);
-	this.useMap = check(parameters.useMap, 0);
-	this.alphaMap = check(parameters.alphaMap, null);
-	this.useAlphaMap = check(parameters.useAlphaMap, 0);
-	this.color = check(parameters.color, new THREE.Color(0xffffff));
-	this.opacity = check(parameters.opacity, 1);
-	this.resolution = check(parameters.resolution, new THREE.Vector2(1, 1));
-	this.sizeAttenuation = check(parameters.sizeAttenuation, 1);
-	this.near = check(parameters.near, 1);
-	this.far = check(parameters.far, 1);
-	this.dashArray = check(parameters.dashArray, []);
-	this.useDash = (this.dashArray !== []) ? 1 : 0;
-	this.visibility = check(parameters.visibility, 1);
-	this.alphaTest = check(parameters.alphaTest, 0);
-	this.repeat = check(parameters.repeat, new THREE.Vector2(1, 1));
-
-	var material = new THREE.RawShaderMaterial({
-		uniforms: {
-			lineWidth: { type: 'f', value: this.lineWidth },
-			map: { type: 't', value: this.map },
-			useMap: { type: 'f', value: this.useMap },
-			alphaMap: { type: 't', value: this.alphaMap },
-			useAlphaMap: { type: 'f', value: this.useAlphaMap },
-			color: { type: 'c', value: this.color },
-			opacity: { type: 'f', value: this.opacity },
-			resolution: { type: 'v2', value: this.resolution },
-			sizeAttenuation: { type: 'f', value: this.sizeAttenuation },
-			near: { type: 'f', value: this.near },
-			far: { type: 'f', value: this.far },
-			dashArray: { type: 'v2', value: new THREE.Vector2(this.dashArray[0], this.dashArray[1]) },
-			useDash: { type: 'f', value: this.useDash },
-			visibility: { type: 'f', value: this.visibility },
-			alphaTest: { type: 'f', value: this.alphaTest },
-			repeat: { type: 'v2', value: this.repeat }
-		},
-		vertexShader: vertexShaderSource.join('\r\n'),
-		fragmentShader: fragmentShaderSource.join('\r\n')
-	});
-
-	delete parameters.lineWidth;
-	delete parameters.map;
-	delete parameters.useMap;
-	delete parameters.alphaMap;
-	delete parameters.useAlphaMap;
-	delete parameters.color;
-	delete parameters.opacity;
-	delete parameters.resolution;
-	delete parameters.sizeAttenuation;
-	delete parameters.near;
-	delete parameters.far;
-	delete parameters.dashArray;
-	delete parameters.visibility;
-	delete parameters.alphaTest;
-	delete parameters.repeat;
-
-	material.type = 'MeshLineMaterial';
-
-	material.setValues(parameters);
-
-	return material;
-
-};
-
-MeshLineMaterial.prototype = Object.create(THREE.Material.prototype);
-MeshLineMaterial.prototype.constructor = MeshLineMaterial;
-
-MeshLineMaterial.prototype.copy = function (source) {
-
-	THREE.Material.prototype.copy.call(this, source);
-
-	this.lineWidth = source.lineWidth;
-	this.map = source.map;
-	this.useMap = source.useMap;
-	this.alphaMap = source.alphaMap;
-	this.useAlphaMap = source.useAlphaMap;
-	this.color.copy(source.color);
-	this.opacity = source.opacity;
-	this.resolution.copy(source.resolution);
-	this.sizeAttenuation = source.sizeAttenuation;
-	this.near = source.near;
-	this.far = source.far;
-	this.dashArray.copy(source.dashArray);
-	this.useDash = source.useDash;
-	this.visibility = source.visibility;
-	this.alphaTest = source.alphaTest;
-	this.repeat.copy(source.repeat);
-
-	return this;
-
-};
 
 export { MeshLine, MeshLineMaterial };

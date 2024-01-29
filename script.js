@@ -241,7 +241,10 @@ function animate() {
     );
 
     // Update the position of the sky
-    sky.rotation.set(0, 0, angle * skySpeed);
+    if (sky) {
+       sky.rotation.set(0, 0, angle * skySpeed);
+    }
+
 
     // Change light color to simulate sunrise and sunset
     const lightColor = new THREE.Color();
